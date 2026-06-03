@@ -22,8 +22,6 @@ def test_prometheus_query_uses_datasource_proxy_and_bearer() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
-        if request.url.path == "/api/datasources/uid/prometheus":
-            return httpx.Response(200, json={"uid": "prometheus", "type": "prometheus"})
         assert request.url.path == "/api/datasources/proxy/uid/prometheus/api/v1/query"
         assert request.headers["Authorization"] == "Bearer jwt"
         assert request.url.params["query"] == "up"
@@ -33,25 +31,16 @@ def test_prometheus_query_uses_datasource_proxy_and_bearer() -> None:
 
     assert result == {"status": "success"}
     assert [request.url.path for request in requests] == [
-        "/api/datasources/uid/prometheus",
         "/api/datasources/proxy/uid/prometheus/api/v1/query",
     ]
 
 
-def test_loki_query_resolves_loki_datasource_by_name_when_uid_missing() -> None:
+def test_loki_query_uses_default_loki_uid() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
-        if request.url.path == "/api/datasources":
-            return httpx.Response(
-                200,
-                json=[
-                    {"uid": "prometheus", "name": "Prometheus", "type": "prometheus"},
-                    {"uid": "loki-uid", "name": "Loki", "type": "loki"},
-                ],
-            )
-        assert request.url.path == "/api/datasources/proxy/uid/loki-uid/loki/api/v1/query_range"
+        assert request.url.path == "/api/datasources/proxy/uid/loki/loki/api/v1/query_range"
         assert request.url.params["query"] == "{namespace=\"tank-operator\"}"
         assert request.url.params["limit"] == "50"
         return httpx.Response(200, json={"status": "success"})
@@ -64,15 +53,13 @@ def test_loki_query_resolves_loki_datasource_by_name_when_uid_missing() -> None:
 
     assert result == {"status": "success"}
     assert [request.url.path for request in requests] == [
-        "/api/datasources",
-        "/api/datasources/proxy/uid/loki-uid/loki/api/v1/query_range",
+        "/api/datasources/proxy/uid/loki/loki/api/v1/query_range",
     ]
 
 
 def test_prometheus_alerts_filters_firing_and_limits() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        if request.url.path == "/api/datasources/uid/prometheus":
-            return httpx.Response(200, json={"uid": "prometheus", "type": "prometheus"})
+        assert request.url.path == "/api/datasources/proxy/uid/prometheus/api/v1/alerts"
         return httpx.Response(
             200,
             json={

@@ -117,12 +117,10 @@ class GrafanaClient:
         name: str | None = None,
     ) -> str:
         if preferred_uid:
-            try:
-                self._request(service_jwt, "GET", f"/api/datasources/uid/{preferred_uid}")
-                return preferred_uid
-            except httpx.HTTPStatusError as exc:
-                if exc.response.status_code != 404:
-                    raise
+            # Service JWTs map to a read-only Grafana role. They can query
+            # datasource proxy endpoints but cannot call datasource admin APIs
+            # such as /api/datasources/uid/{uid}; trust explicit/default UIDs.
+            return preferred_uid
 
         matches = self.list_datasources(
             service_jwt,
@@ -275,7 +273,7 @@ class GrafanaClient:
         service_jwt: str,
         *,
         query: str,
-        datasource_uid: str | None = None,
+        datasource_uid: str | None = "loki",
         start: str | None = None,
         end: str | None = None,
         limit: int | None = 100,

@@ -132,7 +132,7 @@ def register_tools(mcp: FastMCP, client: GrafanaClient) -> None:
     @mcp.tool()
     def query_loki(
         query: str,
-        datasource_uid: str | None = None,
+        datasource_uid: str | None = "loki",
         start: str | None = None,
         end: str | None = None,
         limit: int | None = 100,
@@ -140,9 +140,8 @@ def register_tools(mcp: FastMCP, client: GrafanaClient) -> None:
     ) -> dict[str, Any]:
         """Run a Loki range query through Grafana's Loki datasource proxy.
 
-        If `datasource_uid` is omitted, the server resolves the provisioned
-        `Loki` datasource by type/name. `start` and `end` may be Unix
-        nanoseconds or RFC3339 strings.
+        `datasource_uid` defaults to the `loki` UID pinned in osms. `start`
+        and `end` may be Unix nanoseconds or RFC3339 strings.
         """
         return client.loki_query(
             _service_bearer(),

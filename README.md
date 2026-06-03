@@ -13,6 +13,11 @@ diagnostics.
 - `list_alertmanager_alerts()` - Alertmanager alerts from the datasource proxy.
 - `query_loki()` - Loki range query through the Grafana datasource proxy.
 
+`query_prometheus`, `list_prometheus_alerts`, and `list_alertmanager_alerts`
+default to the `prometheus` and `alertmanager` datasource UIDs provisioned by
+kube-prometheus-stack. `query_loki` defaults to the `loki` UID pinned in
+`romaine-life/osms`.
+
 ## Auth
 
 Inbound transport is gated by `kube-rbac-proxy` using Kubernetes
