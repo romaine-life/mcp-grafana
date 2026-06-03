@@ -1,0 +1,33 @@
+# ============================================================================
+# mcp-grafana values
+# ============================================================================
+
+image:
+  repository: romainecr.azurecr.io/mcp-grafana
+  tag: "dev"
+  pullPolicy: IfNotPresent
+
+upstreamPort: 8080
+
+grafanaUrl: https://grafana.romaine.life
+
+proxy:
+  image:
+    repository: quay.io/brancz/kube-rbac-proxy
+    tag: v0.18.2
+    pullPolicy: IfNotPresent
+  port: 8443
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+proxyResources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 64Mi

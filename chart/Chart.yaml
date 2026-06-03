@@ -1,0 +1,4 @@
+apiVersion: v2
+name: mcp-grafana
+version: 0.1.0
+description: Read-only Grafana MCP Server (HTTP). Session pods query Grafana using their forwarded auth.romaine.life service JWT.
